@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Client5KiPrend": {
+      "commandName": "Project",
+      "commandLineArgs": "localhost 3490"
+    }
+  }
+}
