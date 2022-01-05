@@ -179,8 +179,8 @@ namespace WpfApp1.ViewModel
                 case "CARDS":
                     UpdateHand(code[1]);
                     break;
-                case "":
-                    Console.WriteLine("The number is one!");
+                case "BOARD":
+                    UpdateBoard(code[1]);
                     break;
                 default:
                     break;
@@ -194,7 +194,7 @@ namespace WpfApp1.ViewModel
 
             List<Card> newHand = new();
 
-            foreach(string num in stringHand)
+            foreach (string num in stringHand)
             {
                 newHand.Add(new Card()
                 {
@@ -204,6 +204,40 @@ namespace WpfApp1.ViewModel
 
 
             Hand = newHand;
+        }
+        private void UpdateBoard(string message)
+        {
+
+            string[] stringLine = message.Split(';');
+
+            List<Cards> newBoard = new();
+
+            foreach (string line in stringLine)
+            {
+                if (string.IsNullOrEmpty(line))
+                {
+                    continue;
+                }
+
+                Cards cards = new();
+                string[] stringLineCards = message.Split(',');
+                foreach (string num in stringLineCards)
+                {
+                    if (string.IsNullOrEmpty(num))
+                    {
+                        continue;
+                    }
+                    cards.Line.Add(new Card()
+                    {
+                        Num = int.Parse(num)
+                    });
+                }
+
+                newBoard.Add(cards);
+            }
+
+
+            Board = newBoard;
         }
     }
 
