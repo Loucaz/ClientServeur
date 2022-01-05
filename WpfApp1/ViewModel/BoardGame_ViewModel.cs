@@ -1,36 +1,112 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using WpfApp1.Model;
 
 namespace WpfApp1.ViewModel
 {
-    public class BoardGame_ViewModel
+    public class BoardGame_ViewModel : INotifyPropertyChanged
     {
-        public List<Cards> Board { get; set; }
+        private List<Cards> board;
+
+        public List<Cards> Board
+        {
+            get { return board; }
+            set
+            {
+                board = value;
+                OnPropertyChanged();
+            }
+        }
+        private List<Card> hand;
+
+        public List<Card> Hand
+        {
+            get { return hand; }
+            set
+            {
+                hand = value;
+                OnPropertyChanged();
+            }
+        }
 
         Connexion connexion = new Connexion();
 
-        public string text { get; set; }
+        private List<string> messageServ;
 
-        public BoardGame_ViewModel()
+        public List<string> MessageServ
+        {
+            get { return messageServ; }
+            set
+            {
+                messageServ = value;
+                OnPropertyChanged();
+            }
+        }
+        public string namePlayer
+        {
+            get;
+            set;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private string Text;
+        public string text
+        {
+            get { return Text; }
+            set
+            {
+                MessageServ = new List<string>
+                {
+                    MessageServ[1],
+                    MessageServ[2],
+                    MessageServ[3],
+                    MessageServ[4],
+                    value
+                };
+                Text = value;
+                OnPropertyChanged();
+                Lire(value);
+
+            }
+        }
+
+
+        public BoardGame_ViewModel(string nameP)
         {
             GenereBoard();
-            text = "";
+            MessageServ = new List<string>
+            {
+                "...",
+                "...",
+                "En attente du serv",
+                "Il arrive promis",
+                "..."
+            };
+            namePlayer = nameP;
+            text = "JOIN:" + namePlayer;
             _ = connexion.MainConnexion();
+
+            _ = ClickCommandAsync();
+
+            _ = Boucle();
         }
         public async Task ClickCommandAsync()
         {
-            _ = connexion.setMessageAsync("DATE");
-            text = await connexion.getMessageAsync();
+            _ = await connexion.setMessageAsync(text);
         }
 
         private void GenereBoard()
         {
-            Board = new List<Cards>();
+            List<Cards> newBoard = new List<Cards>();
+            List<Card> newHand = new List<Card>();
 
             for (int y = 0; y < 4; y++)
             {
@@ -38,12 +114,21 @@ namespace WpfApp1.ViewModel
 
                 for (int x = 0; x < 5; x++)
                 {
-                    Card c = new Card();
-                    c.Num = new Random().Next(104);
+                    Card c = new()
+                    {
+                        Num = new Random().Next(104)
+                    };
                     cards.Line.Add(c);
+                    if (x < 2)
+                    {
+                        newHand.Add(c);
+                    }
                 }
 
-                Board.Add(cards);
+                newBoard.Add(cards);
+
+                Board = newBoard;
+                Hand = newHand;
             }
 
         }
@@ -70,6 +155,55 @@ namespace WpfApp1.ViewModel
         public void MyAction()
         {
             _ = ClickCommandAsync();
+        }
+
+
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+
+        private async Task Boucle()
+        {
+            while (true)
+            {
+                text = await Task.Run(() => connexion.getMessageAsync());
+            }
+        }
+        private void Lire(string message)
+        {
+            string[] code = message.Split(':');
+            switch (code[0])
+            {
+                case "CARDS":
+                    UpdateHand(code[1]);
+                    break;
+                case "":
+                    Console.WriteLine("The number is one!");
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void UpdateHand(string message)
+        {
+
+            string[] stringHand = message.Split(',');
+
+            List<Card> newHand = new();
+
+            foreach(string num in stringHand)
+            {
+                newHand.Add(new Card()
+                {
+                    Num = int.Parse(num)
+                });
+            }
+
+
+            Hand = newHand;
         }
     }
 

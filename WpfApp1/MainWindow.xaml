@@ -7,6 +7,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button Click="Join_Button">Hello, World!</Button>
+        <StackPanel>
+        <TextBox Name="namePlayer">
+            Initial text contents of the TextBox.
+        </TextBox>
+        <Button Click="Join_Button">Rejoindre la partie !</Button>
+        </StackPanel>
     </Grid>
 </Window>

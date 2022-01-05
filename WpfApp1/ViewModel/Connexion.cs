@@ -19,16 +19,9 @@ namespace WpfApp1.ViewModel
 
         public async Task MainConnexion()
         {
-            Console.WriteLine("**********************************************************");
-            Console.WriteLine("*       Simple C# socket async client application        *");
-            Console.WriteLine("**********************************************************");
-            Console.WriteLine("");
-            Console.WriteLine("");
-
             string[] args = Environment.GetCommandLineArgs();
             // Lecture des paramètres en cours
-            int port;
-            if (args == null || args.Length != 3 || !int.TryParse(args[2], out port))
+            if (args == null || args.Length != 3 || !int.TryParse(args[2], out int port))
             {
                 string file = typeof(Connexion).Assembly.Location;
                 string appExeName = System.IO.Path.GetFileNameWithoutExtension(file);
@@ -44,6 +37,8 @@ namespace WpfApp1.ViewModel
             Console.WriteLine("Connection to server opened successfully !");
             return;
             string command;
+
+            /*
             while (true)
             {
                 Console.WriteLine("");
@@ -95,6 +90,7 @@ namespace WpfApp1.ViewModel
             }
 
             CloseConnection();
+            */
         }
 
         private static string GetAddress(string serverAddress)
@@ -167,14 +163,14 @@ namespace WpfApp1.ViewModel
             isReceivingData = true;
             receivedData = null;
 
-            var tWaitForEndingSendingData = Task.Run(() => { while (isSendingData) ; });
+            //var tWaitForEndingSendingData = Task.Run(() => { while (isSendingData) ; });
             var tWaitForDataAvailable = Task.Run(() => { while (socket.Available == 0) ; });
             _ = Task.Factory.ContinueWhenAll(
-                new Task[] { tWaitForEndingSendingData, tWaitForDataAvailable },
+                new Task[] { tWaitForDataAvailable }, //{ tWaitForEndingSendingData, tWaitForDataAvailable },
                 t =>
                 {
                     // Délai d'attente artificiel
-                    Thread.Sleep(4000);
+                    //Thread.Sleep(4000);
 
                     // Lecture des données
                     try
@@ -237,27 +233,20 @@ namespace WpfApp1.ViewModel
             await Task.Run(() => { while (isSendingData) ; });
 
             isSendingData = true;
+            // Délai d'attente artificiel
+            //Thread.Sleep(4000);
 
-            var tWaitForEndingReceivingData = Task.Run(() => { while (isReceivingData) ; });
-            _ = Task.Factory.ContinueWhenAll(
-                new Task[] { tWaitForEndingReceivingData },
-                t =>
-                {
-                    // Délai d'attente artificiel
-                    Thread.Sleep(4000);
-
-                    // Envoi des données
-                    try
-                    {
-                        buffer = System.Text.Encoding.UTF8.GetBytes(message);
-                        socket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, SendCallback, null);
-                    }
-                    catch (SocketException e)
-                    {
-                        Console.WriteLine("");
-                        Console.WriteLine("Error while starting sending data on socket : " + e.Message);
-                    }
-                });
+            // Envoi des données
+            try
+            {
+                buffer = System.Text.Encoding.UTF8.GetBytes(message);
+                socket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, SendCallback, null);
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("");
+                Console.WriteLine("Error while starting sending data on socket : " + e.Message);
+            }
             return true;
         }
         private static void SendCallback(IAsyncResult AR)
@@ -285,6 +274,8 @@ namespace WpfApp1.ViewModel
 
         public async Task<string> getMessageAsync()
         {
+
+           // Thread.Sleep(4000);
             bool levier = true;
             while (levier)
             {
@@ -302,8 +293,9 @@ namespace WpfApp1.ViewModel
 
         public async Task<bool> setMessageAsync(string command)
         {
-            bool levier = true;
-            while (levier)
+            if (socket == null)
+                return false;
+            while (true)
             {
                 // Lecture de la réponse du serveur
                 if (!await BeginSendAsync(command))
@@ -312,9 +304,8 @@ namespace WpfApp1.ViewModel
                 while (isSendingData)
                 {
                 }
-                levier = false;
+                return true;
             }
-            return true;
         }
     }
 }

@@ -6,4 +6,25 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="component\Images\**" />
+    <EmbeddedResource Remove="component\Images\**" />
+    <None Remove="component\Images\**" />
+    <Page Remove="component\Images\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="images\taureau.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="component\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="images\taureau.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

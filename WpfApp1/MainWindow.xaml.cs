@@ -27,7 +27,7 @@ namespace WpfApp1
         }
         private void Join_Button(object sender, RoutedEventArgs e)
         {
-            Window1 win2 = new Window1();
+            Window1 win2 = new Window1(namePlayer.Text);
             win2.Show();
             this.Close();
         }
