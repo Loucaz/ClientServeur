@@ -196,6 +196,10 @@ namespace WpfApp1.ViewModel
 
             foreach (string num in stringHand)
             {
+                if (string.IsNullOrEmpty(num))
+                {
+                    continue;
+                }
                 newHand.Add(new Card()
                 {
                     Num = int.Parse(num)
@@ -220,7 +224,7 @@ namespace WpfApp1.ViewModel
                 }
 
                 Cards cards = new();
-                string[] stringLineCards = message.Split(',');
+                string[] stringLineCards = line.Split(',');
                 foreach (string num in stringLineCards)
                 {
                     if (string.IsNullOrEmpty(num))
