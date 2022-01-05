@@ -169,6 +169,8 @@ namespace WpfApp1.ViewModel
             while (true)
             {
                 text = await Task.Run(() => connexion.getMessageAsync());
+
+                _ = connexion.setMessageAsync("OK");
             }
         }
         private void Lire(string message)
