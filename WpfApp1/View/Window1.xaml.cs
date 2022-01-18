@@ -25,13 +25,22 @@ namespace WpfApp1.View
     {
         public BoardGame_ViewModel Board { get; set; }
 
-        public Window1(string n = "player")
+        public Window1(string n = "player",bool debug = false)
         {
             Board = new BoardGame_ViewModel(n);
             DataContext = Board;
             InitializeComponent();
+
+            if (!debug)
+            {
+                listMessageServ.Visibility = Visibility.Hidden;
+                listMessageServText.Visibility = Visibility.Hidden;
+                text.Visibility = Visibility.Hidden;
+            }
         }
 
+
+        //A mettre dans le VueModel
         private void SlectCard(object sender, SelectionChangedEventArgs e)
         {
             Card carte = (Card)(sender as ListBox).SelectedItem;
@@ -42,5 +51,6 @@ namespace WpfApp1.View
             int line = (sender as ListBox).SelectedIndex;
             Board.text = "Line:" + line;
         }
+        //
     }
 }

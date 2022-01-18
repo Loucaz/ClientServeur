@@ -7,18 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="component\Images\**" />
-    <EmbeddedResource Remove="component\Images\**" />
-    <None Remove="component\Images\**" />
-    <Page Remove="component\Images\**" />
+    <Compile Remove="component\**" />
+    <EmbeddedResource Remove="component\**" />
+    <None Remove="component\**" />
+    <Page Remove="component\**" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="images\taureau.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="component\" />
   </ItemGroup>
 
   <ItemGroup>

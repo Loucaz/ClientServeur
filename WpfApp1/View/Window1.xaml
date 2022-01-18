@@ -12,11 +12,30 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <StackPanel>
-            <TextBlock Text="LOLOLOL" />
-            <Button Command="{Binding ClickCommand}"  Content="Bouton"/>
-            <TextBlock Text="{Binding text}" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.ColumnSpan="2" >
+
+            <TextBlock x:Name="listMessageServText" Text="Message du serveur: " />
+            <ListBox x:Name="listMessageServ" ItemsSource= "{Binding MessageServ}">
+
+                <ListBox.ItemTemplate >
+
+                    <DataTemplate >
+
+                        <StackPanel Margin="5">
+                            <TextBlock Text="{Binding}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock x:Name="text" Text="{Binding text}" />
 
             <ListBox x:Name="listHand" ItemsSource= "{Binding Hand}" SelectionChanged="SlectCard" SelectionMode="Single">
 
@@ -38,24 +57,13 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <ListBox x:Name="listMessageServ" ItemsSource= "{Binding MessageServ}">
-
-                <ListBox.ItemTemplate >
-
-                    <DataTemplate >
-
-                        <StackPanel Margin="5">
-                            <TextBlock Text="{Binding}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <Button Command="{Binding ClickCommand}"  Content="Envoyer au Serveur"/>
+            <TextBlock Text="{Binding textServer}" />
         </StackPanel>
-        <ListBox x:Name="listBox1" ItemsSource = "{Binding Board}" Grid.Column="2" SelectionChanged="SlectLine" SelectionMode="Single">
+        <ListBox Grid.Column="2" Grid.ColumnSpan="2" x:Name="listBox1" ItemsSource = "{Binding Board}"  SelectionChanged="SlectLine" SelectionMode="Single">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
-                        <TextBlock Text="Test:" />
                         <ListBox x:Name="listBox2" ItemsSource= "{Binding Line}">
 
                             <ListBox.ItemsPanel>
@@ -80,5 +88,8 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+
+        <TextBlock Grid.Column="2" Grid.Row="1" Text="Tes tetes de taureaux malus :" />
+        <TextBlock Grid.Column="3" Grid.Row="1" Text="{Binding Score}" />
     </Grid>
 </Window>

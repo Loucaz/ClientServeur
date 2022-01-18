@@ -15,7 +15,6 @@ namespace WpfApp1.ViewModel
     public class BoardGame_ViewModel : INotifyPropertyChanged
     {
         private List<Cards> board;
-
         public List<Cards> Board
         {
             get { return board; }
@@ -25,8 +24,8 @@ namespace WpfApp1.ViewModel
                 OnPropertyChanged();
             }
         }
-        private List<Card> hand;
 
+        private List<Card> hand;
         public List<Card> Hand
         {
             get { return hand; }
@@ -55,6 +54,16 @@ namespace WpfApp1.ViewModel
             get;
             set;
         }
+        public string textServer
+        {
+            get;
+            set;
+        }
+        public string Score
+        {
+            get;
+            set;
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private string Text;
@@ -63,6 +72,7 @@ namespace WpfApp1.ViewModel
             get { return Text; }
             set
             {
+
                 MessageServ = new List<string>
                 {
                     MessageServ[1],
@@ -81,7 +91,9 @@ namespace WpfApp1.ViewModel
 
         public BoardGame_ViewModel(string nameP)
         {
+            Score = "0";
             GenereBoard();
+            textServer = "Attente du Serveur";
             MessageServ = new List<string>
             {
                 "...",
@@ -103,6 +115,7 @@ namespace WpfApp1.ViewModel
             _ = await connexion.setMessageAsync(text);
         }
 
+        //Pour des tests em local
         private void GenereBoard()
         {
             List<Cards> newBoard = new List<Cards>();
@@ -116,10 +129,10 @@ namespace WpfApp1.ViewModel
                 {
                     Card c = new()
                     {
-                        Num = new Random().Next(104)
+                        Num = new Random().Next(0)
                     };
                     cards.Line.Add(c);
-                    if (x < 2)
+                    if (x < 1)
                     {
                         newHand.Add(c);
                     }
@@ -170,7 +183,7 @@ namespace WpfApp1.ViewModel
             {
                 text = await Task.Run(() => connexion.getMessageAsync());
 
-                _ = connexion.setMessageAsync("OK");
+               // _ = connexion.setMessageAsync("OK");
             }
         }
         private void Lire(string message)
@@ -183,10 +196,25 @@ namespace WpfApp1.ViewModel
                     break;
                 case "BOARD":
                     UpdateBoard(code[1]);
+                    textServer = "Choisis une carte et envoye la au serveur !";
+                    break;
+                case "LINE":
+                    textServer = "Choisis une ligne et envoye la au serveur !";
+                    break;
+                case "SCORE":
+                    UpdateScore(code[1]);
+                    break;
+                case "NO":
+                    textServer = "Le serveur n'as pas compris ta commande !";
                     break;
                 default:
                     break;
             }
+        }
+
+        private void UpdateScore(string message)
+        {
+            Score = message;
         }
 
         private void UpdateHand(string message)
