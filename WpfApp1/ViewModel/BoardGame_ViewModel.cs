@@ -14,6 +14,51 @@ namespace WpfApp1.ViewModel
 {
     public class BoardGame_ViewModel : INotifyPropertyChanged
     {
+
+        #region Button
+        private bool canClose;
+        public bool CanClose
+        {
+            get { return canClose; }
+            set
+            {
+                canClose = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public async Task ClickCommandAsync()
+        {
+
+            TextServer = "Attente du serveur....";
+            CanClose = false;
+            _ = await connexion.setMessageAsync(text);
+            text = "Client->" + text;
+        }
+
+
+        private ICommand _clickCommand;
+        public ICommand ClickCommand
+        {
+            get
+            {
+                return _clickCommand ?? (_clickCommand = new CommandHandler(() => MyAction(), () => CanExecute));
+            }
+        }
+        public bool CanExecute
+        {
+            get
+            {
+                // check if executing is allowed, i.e., validate, check if a process is running, etc. 
+                return true;
+            }
+        }
+
+        public void MyAction()
+        {
+            _ = ClickCommandAsync();
+        }
+        #endregion
         private List<Cards> board;
         public List<Cards> Board
         {
@@ -54,15 +99,28 @@ namespace WpfApp1.ViewModel
             get;
             set;
         }
-        public string textServer
+        private string textServer;
+
+        public string TextServer
         {
-            get;
-            set;
+            get { return textServer; }
+            set
+            {
+                textServer = value;
+                OnPropertyChanged();
+            }
         }
+
+        private string score;
+
         public string Score
         {
-            get;
-            set;
+            get { return score; }
+            set
+            {
+                score = value;
+                OnPropertyChanged();
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -83,7 +141,6 @@ namespace WpfApp1.ViewModel
                 };
                 Text = value;
                 OnPropertyChanged();
-                Lire(value);
 
             }
         }
@@ -93,7 +150,7 @@ namespace WpfApp1.ViewModel
         {
             Score = "0";
             GenereBoard();
-            textServer = "Attente du Serveur";
+            TextServer = "Attente du Serveur";
             MessageServ = new List<string>
             {
                 "...",
@@ -109,10 +166,6 @@ namespace WpfApp1.ViewModel
             _ = ClickCommandAsync();
 
             _ = Boucle();
-        }
-        public async Task ClickCommandAsync()
-        {
-            _ = await connexion.setMessageAsync(text);
         }
 
         //Pour des tests em local
@@ -138,6 +191,7 @@ namespace WpfApp1.ViewModel
                     }
                 }
 
+                cards.Index = y;
                 newBoard.Add(cards);
 
                 Board = newBoard;
@@ -146,29 +200,6 @@ namespace WpfApp1.ViewModel
 
         }
 
-
-
-        private ICommand _clickCommand;
-        public ICommand ClickCommand
-        {
-            get
-            {
-                return _clickCommand ?? (_clickCommand = new CommandHandler(() => MyAction(), () => CanExecute));
-            }
-        }
-        public bool CanExecute
-        {
-            get
-            {
-                // check if executing is allowed, i.e., validate, check if a process is running, etc. 
-                return true;
-            }
-        }
-
-        public void MyAction()
-        {
-            _ = ClickCommandAsync();
-        }
 
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
@@ -181,9 +212,11 @@ namespace WpfApp1.ViewModel
         {
             while (true)
             {
-                text = await Task.Run(() => connexion.getMessageAsync());
+                string reponse = await Task.Run(() => connexion.getMessageAsync());
+                text = "Server->" + reponse;
 
-               // _ = connexion.setMessageAsync("OK");
+                Lire(reponse);
+                _ = connexion.setMessageAsync("OK");
             }
         }
         private void Lire(string message)
@@ -196,20 +229,21 @@ namespace WpfApp1.ViewModel
                     break;
                 case "BOARD":
                     UpdateBoard(code[1]);
-                    textServer = "Choisis une carte et envoye la au serveur !";
+                    TextServer = "Choisis une carte et envoye la au serveur !";
                     break;
                 case "LINE":
-                    textServer = "Choisis une ligne et envoye la au serveur !";
+                    TextServer = "Choisis une ligne et envoye la au serveur !";
                     break;
                 case "SCORE":
                     UpdateScore(code[1]);
                     break;
                 case "NO":
-                    textServer = "Le serveur n'as pas compris ta commande !";
+                    TextServer = "Le serveur n'as pas compris ta commande !";
                     break;
                 default:
                     break;
             }
+            CanClose = true;
         }
 
         private void UpdateScore(string message)
@@ -246,8 +280,10 @@ namespace WpfApp1.ViewModel
 
             List<Cards> newBoard = new();
 
+            int index = 0;
             foreach (string line in stringLine)
             {
+                index++;
                 if (string.IsNullOrEmpty(line))
                 {
                     continue;
@@ -266,7 +302,7 @@ namespace WpfApp1.ViewModel
                         Num = int.Parse(num)
                     });
                 }
-
+                cards.Index = index;
                 newBoard.Add(cards);
             }
 

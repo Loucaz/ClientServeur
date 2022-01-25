@@ -13,7 +13,7 @@ namespace WpfApp1.Model
         {
             Line = new List<Card>();
         }
-
+        public int Index { get; set; }
         public List<Card> Line { get; set; }
     }
 
